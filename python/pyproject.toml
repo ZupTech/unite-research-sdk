@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "unite-research-sdk"
+version = "1.0.0"
+description = "Official Unite Research Python SDK and CLI for published creative benchmarks"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Unite Research"}]
+keywords = ["unite", "research", "sdk", "benchmark", "marketing", "black-friday"]
+classifiers = ["Programming Language :: Python :: 3", "Topic :: Scientific/Engineering :: Information Analysis"]
+
+[project.urls]
+Homepage = "https://research.unitebr.com/developers"
+Repository = "https://github.com/ZupTech/unite-research-sdk"
+Documentation = "https://research.unitebr.com/developers"
+
+[project.scripts]
+unite-research = "unite_research.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

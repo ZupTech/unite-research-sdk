@@ -1,0 +1,46 @@
+{
+  "name": "unite-research-sdk",
+  "version": "1.0.0",
+  "description": "Official Unite Research JavaScript/TypeScript SDK and CLI for published creative benchmarks.",
+  "type": "module",
+  "main": "./javascript/index.mjs",
+  "types": "./javascript/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./javascript/index.d.ts",
+      "import": "./javascript/index.mjs"
+    }
+  },
+  "bin": {
+    "unite-research": "./javascript/cli.mjs"
+  },
+  "files": [
+    "javascript/index.mjs",
+    "javascript/index.d.ts",
+    "javascript/cli.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "homepage": "https://research.unitebr.com/developers",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZupTech/unite-research-sdk.git"
+  },
+  "keywords": [
+    "unite",
+    "research",
+    "sdk",
+    "cli",
+    "black-friday",
+    "benchmark",
+    "marketing",
+    "mcp"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
