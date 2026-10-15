@@ -36,3 +36,7 @@ for row in api.iterate_rows("ch-bfday"):
 [API documentation](https://research.unitebr.com/developers) · [OpenAPI](https://research.unitebr.com/openapi.json) · [Version policy](https://research.unitebr.com/api-policy) · [MCP endpoint](https://research.unitebr.com/mcp) · [Agent skill](skills/research-benchmark/SKILL.md).
 
 SDK code: MIT. The study/data retain their [published attribution and reuse terms](https://research.unitebr.com/api/v1/citation). Observational associations do not establish causality.
+
+## Verified MCP server
+
+The public remote MCP server is listed as **active** in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/com.unitebr.research%2Fbenchmark/versions/latest), under the domain-verified name `com.unitebr.research/benchmark`, version 1.1.0. Connect to `https://research.unitebr.com/mcp`. MCP Apps-compatible hosts can display an interactive chart explorer; other hosts receive the same structured data.
