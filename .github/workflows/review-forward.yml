@@ -1,0 +1,59 @@
+# Repassa os eventos de PR para a tarefa `review-github-event` do unite-alerts (UNI-1966).
+#
+# Este arquivo é igual em todo repositório que participa do fluxo de revisão.
+# Ele não faz checkout e não roda código do PR: só lê o JSON do evento e avisa o Trigger.dev
+# "olhe o PR N". Vão só números e ids; quem comentou, o texto e o estado da review são relidos
+# pela automação na API do GitHub, então um payload alterado não forja um "assumiu".
+#
+# Segredo necessário no repositório (ou na org): TRIGGER_REVIEW_TOKEN. É um token que só
+# dispara a tarefa review-github-event (gerado por scripts/review-trigger-token.ts), não a
+# chave tr_prod_ do projeto. PRs do Dependabot só recebem o segredo se ele também estiver em
+# "Dependabot secrets"; sem ele, a conferência de 5 em 5 minutos cria a thread e os checks.
+#
+# auto_merge_enabled/disabled só atualizam a linha "Auto-merge ligado" da thread. O workflow não
+# liga auto-merge: um merge feito em nome do GITHUB_TOKEN não dispara os workflows de push.
+name: Revisão (automação)
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, converted_to_draft, synchronize, edited, closed, review_requested, auto_merge_enabled, auto_merge_disabled]
+  pull_request_review:
+    types: [submitted]
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+jobs:
+  forward:
+    # O nome do job vira o nome do check no commit; a automação o ignora ao olhar o CI (FORWARD_JOB_NAME).
+    name: revisao-automacao
+    # Comentário só interessa se for num PR e começar com um comando (/assumir, /desistir, /urgente).
+    if: github.event_name != 'issue_comment' || (github.event.issue.pull_request && startsWith(github.event.comment.body, '/'))
+    runs-on: ubuntu-26.04
+    timeout-minutes: 2
+    steps:
+      - name: Encaminha o evento para o unite-alerts
+        env:
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_REVIEW_TOKEN }}
+        run: |
+          if [ -z "$TRIGGER_TOKEN" ]; then
+            echo "::warning::TRIGGER_REVIEW_TOKEN não configurado; evento não repassado (a conferência de 5 min cobre)."
+            exit 0
+          fi
+          payload=$(jq -c --arg ev "$GITHUB_EVENT_NAME" '{
+            event: $ev,
+            action: .action,
+            repo: .repository.full_name,
+            number: (.pull_request.number // .issue.number),
+            comment: (if .comment then {id: .comment.id} else null end),
+            review: (if .review then {id: .review.id} else null end),
+            requestedReviewer: (.requested_reviewer.login // null)
+          }' "$GITHUB_EVENT_PATH")
+          jq -n --argjson p "$payload" '{payload: $p}' > body.json
+          curl -sS --fail-with-body -X POST \
+            "https://api.trigger.dev/api/v1/tasks/review-github-event/trigger" \
+            -H "Authorization: Bearer $TRIGGER_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @body.json
+
